@@ -51,19 +51,41 @@
 ; Purpose: Returns the concatination of the given two lists, with cont pre-processing
 (define append$
   (lambda (lst1 lst2 cont)
-    #f ;@TODO
-  )
-)
+    (if (empty? lst1)
+    (cont lst2)
+    (append$ (cdr lst1) lst2 (lambda(res) (cont (cons (car lst1) res)))))))
 
 ;;; Q3.2
 ; Signature: equal-trees$(tree1, tree2, succ, fail) 
-; Type: [Tree * Tree * [Tree ->T1] * [Pair->T2] -> T1 U T2
+; Type: [Tree * Tree * [Tree ->T1] * [Pair->T2] -> T1 U T2]
 ; Purpose: Determines the structure identity of a given two lists, with post-processing succ/fail
-(define equal-trees$ 
+(define equal-trees$
   (lambda (tree1 tree2 succ fail)
-    #f ;@TODO
-  )
-)
+    (cond
+      ((and (leaf? tree1) (leaf? tree2))
+       (succ (cons tree1 tree2)))
+
+      ((and (not (pair? tree1)) (not (leaf? tree1))
+            (not (pair? tree2)) (not (leaf? tree2)))
+       (succ '()))
+
+      ((and (pair? tree1) (pair? tree2))
+       (equal-trees$ (car tree1) (car tree2)
+         (lambda (car-res)
+           (equal-trees$ (cdr tree1) (cdr tree2)
+             (lambda (cdr-res)
+               (succ (cons car-res cdr-res)))
+             fail))
+         fail))
+
+      (else
+       (fail (append
+              (if (pair? tree1) tree1 (list tree1))
+              (if (pair? tree2) tree2 (list tree2))))))))
+
+
+
+
 
 
 
