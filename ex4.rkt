@@ -97,7 +97,8 @@
 ;; constant real number
 (define as-real
   (lambda (x)
-  (cons-lzl x (lambda() as-real x))))
+    (cons-lzl x (lambda () (as-real x)))))
+
 
 
 ;; Signature: ++(x, y)
@@ -140,19 +141,22 @@
 ;; square root of `x`
 (define sqrt-with
   (lambda (x y)
-    #f ;@TODO
-  )
-)
+    (cons-lzl y
+              (lambda ()
+                (sqrt-with x
+                  (// (++ y (// x y)) (as-real 2)))))))
 
 ;;; Q4.2.b
 ;; Signature: diag(lzl)
 ;; Type: [ Lzl(Lzl(T)) -> Lzl(T) ]
 ;; Purpose: Diagonalize an infinite lazy list
 (define diag
-  (lambda (lzl)
-    #f ;@TODO
-  )
-)
+  (lambda (lzls)
+    (define diag-helper
+      (lambda (n)
+        (cons-lzl (nth (nth lzls n) n)
+                  (lambda () (diag-helper (+ n 1))))))
+    (diag-helper 0)))
 
 ;;; Q4.2.c
 ;; Signature: rsqrt(x)
@@ -161,6 +165,4 @@
 ;; Example: (take (rsqrt (as-real 4.0)) 6) => '(4.0 2.5 2.05 2.0006097560975613 2.0000000929222947 2.000000000000002)
 (define rsqrt
   (lambda (x)
-    #f ;@TODO
-  )
-)
+    (diag (sqrt-with x x))))
